@@ -29,6 +29,14 @@ internal static class AuthenticationExtensions
             .Validate(
                 keycloak => !string.IsNullOrWhiteSpace(keycloak.Audience),
                 "Keycloak:Audience is required.")
+            .Validate(
+                keycloak =>
+                    string.IsNullOrWhiteSpace(keycloak.MetadataAddress) ||
+                    Uri.TryCreate(
+                        keycloak.MetadataAddress,
+                        UriKind.Absolute,
+                        out _),
+                "Keycloak:MetadataAddress must be an absolute URI when provided.")
             .ValidateOnStart();
 
         services
@@ -36,6 +44,10 @@ internal static class AuthenticationExtensions
             .AddJwtBearer(jwt =>
             {
                 jwt.Authority = options.Authority;
+                if (!string.IsNullOrWhiteSpace(options.MetadataAddress))
+                {
+                    jwt.MetadataAddress = options.MetadataAddress;
+                }
                 jwt.Audience = options.Audience;
                 jwt.RequireHttpsMetadata = options.RequireHttpsMetadata;
                 jwt.MapInboundClaims = false;

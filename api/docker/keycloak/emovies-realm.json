@@ -2,13 +2,22 @@
   "realm": "emovies",
   "enabled": true,
   "displayName": "eMovies",
-  "registrationAllowed": false,
+  "registrationAllowed": true,
+  "defaultRoles": [
+    "offline_access",
+    "uma_authorization",
+    "movies-reader"
+  ],
   "loginWithEmailAllowed": true,
   "roles": {
     "realm": [
       {
         "name": "movies-reader",
         "description": "Can read movies"
+      },
+      {
+        "name": "movies-manager",
+        "description": "Can manage movies, reviews, rentals, and inventory"
       },
       {
         "name": "movies-admin",
@@ -36,10 +45,12 @@
       "directAccessGrantsEnabled": true,
       "standardFlowEnabled": true,
       "redirectUris": [
-        "http://localhost:*"
+        "http://localhost:*",
+        "http://localhost:5000/swagger/oauth2-redirect.html"
       ],
       "webOrigins": [
-        "http://localhost:*"
+        "http://localhost:*",
+        "http://localhost:5000"
       ],
       "protocol": "openid-connect",
       "protocolMappers": [

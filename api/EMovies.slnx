@@ -4,9 +4,11 @@
     <Project Path="src/Modules/Movies/EMovies.Modules.Movies.Contracts/EMovies.Modules.Movies.Contracts.csproj" />
     <Project Path="src/Modules/Movies/EMovies.Modules.Movies/EMovies.Modules.Movies.csproj" />
     <Project Path="src/Modules/Reviews/EMovies.Modules.Reviews/EMovies.Modules.Reviews.csproj" />
+    <Project Path="src/Modules/Users/EMovies.Modules.Users/EMovies.Modules.Users.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/EMovies.Modules.Movies.Tests/EMovies.Modules.Movies.Tests.csproj" />
     <Project Path="tests/EMovies.Modules.Reviews.Tests/EMovies.Modules.Reviews.Tests.csproj" />
+    <Project Path="tests/EMovies.Modules.Users.Tests/EMovies.Modules.Users.Tests.csproj" />
   </Folder>
 </Solution>

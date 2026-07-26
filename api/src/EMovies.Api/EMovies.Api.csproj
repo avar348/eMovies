@@ -5,9 +5,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../Modules/Movies/EMovies.Modules.Movies/EMovies.Modules.Movies.csproj" />
     <ProjectReference Include="../Modules/Reviews/EMovies.Modules.Reviews/EMovies.Modules.Reviews.csproj" />
+    <ProjectReference Include="../Modules/Users/EMovies.Modules.Users/EMovies.Modules.Users.csproj" />
   </ItemGroup>
 </Project>

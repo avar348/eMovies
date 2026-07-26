@@ -8,4 +8,6 @@ public static class ReviewsPolicies
 public static class ReviewsRoles
 {
     public const string Moderator = "reviews-moderator";
+    public const string Manager = "movies-manager";
+    public const string LegacyModerator = "emovies-staff";
 }

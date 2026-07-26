@@ -9,5 +9,8 @@ public static class MoviesPolicies
 public static class MoviesRoles
 {
     public const string Reader = "movies-reader";
+    public const string Manager = "movies-manager";
     public const string Admin = "movies-admin";
+    public const string LegacyReader = "emovies-member";
+    public const string LegacyAdmin = "emovies-admin";
 }

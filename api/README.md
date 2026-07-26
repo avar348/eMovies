@@ -1,8 +1,8 @@
 # eMovies API
 
 ASP.NET Core modular-monolith API using PostgreSQL, Keycloak JWT authentication,
-Entity Framework Core, and AutoMapper. It currently contains Movies and Reviews
-modules.
+Entity Framework Core, and AutoMapper. It currently contains Movies, Reviews,
+and Users modules.
 
 ## Architecture
 
@@ -16,11 +16,16 @@ src/
     ├── Movies/
     │   ├── EMovies.Modules.Movies.Contracts/ # Cross-module movie lookup
     │   └── EMovies.Modules.Movies/
-    └── Reviews/EMovies.Modules.Reviews/
+    ├── Reviews/EMovies.Modules.Reviews/
         ├── Domain/                      # Module entities and invariants
         ├── Application/                 # Models, mapping, and use cases
         ├── Infrastructure/              # PostgreSQL/EF Core
         └── Presentation/                # API controller and authorization
+    └── Users/EMovies.Modules.Users/
+        ├── Domain/                      # User profile and onboarding rules
+        ├── Application/                 # Profile use cases
+        ├── Infrastructure/              # users schema and EF migrations
+        └── Presentation/                # Authenticated profile endpoints
 ```
 
 Each future business area should be added as another module and own its database
@@ -38,7 +43,8 @@ dotnet run --project src/EMovies.Api
 
 Development mode automatically applies EF Core migrations. The API listens on
 `http://localhost:5000`, Keycloak on `http://localhost:8080`, and PostgreSQL on
-`localhost:5432`.
+`localhost:5432`. Swagger UI is available at
+`http://localhost:5000/swagger`.
 
 The included development identities are:
 
@@ -47,6 +53,48 @@ The included development identities are:
 
 These credentials and development-mode settings must be replaced outside local
 development.
+
+Self-registration is enabled in the bundled `emovies` realm. New users receive
+the `movies-reader` role automatically and can sign up through the frontend's
+**Create an account** link. The Users module stores the application profile in
+its own `users` schema. Choosing a library-manager account creates a
+`PendingApproval` profile. When an administrator approves that profile, the API
+assigns the `movies-manager` Keycloak role. Managers can access catalog,
+inventory, rental, and review-moderation operations, while `movies-admin`
+remains reserved for administrator-only work such as approving or denying
+manager requests.
+
+## Roles and permissions
+
+Keycloak roles grant system permissions. The Users module profile tracks the
+product onboarding state, such as whether a library-manager request is still
+pending, active, or denied.
+
+| Role | Intended user | Permissions |
+| --- | --- | --- |
+| `movies-reader` | Movie renter | Browse the movie catalog, view movie details, and use renter-facing movie features. This is the default role for self-registered users. |
+| `movies-manager` | Approved library manager | Includes movie-reader access, plus catalog and inventory management, rental operations, and review moderation. Assigned by the API when an admin approves a pending library-manager profile. Removed by the API when a pending manager request is denied. |
+| `reviews-moderator` | Review moderator | Moderate movie reviews without granting catalog, inventory, rental, or user-approval permissions. |
+| `movies-admin` | Administrator | Full administrative access, including manager approvals. Admins can do manager-level operations, but managers cannot approve or deny other managers. |
+
+Current API policies:
+
+| Policy | Allowed roles |
+| --- | --- |
+| `movies.read` | `movies-reader`, `movies-manager`, `movies-admin` |
+| `movies.write` | `movies-manager`, `movies-admin` |
+| `reviews.moderate` | `reviews-moderator`, `movies-manager`, `movies-admin` |
+| `users.manage-approvals` | `movies-admin` |
+
+Legacy local realm roles are still accepted for compatibility:
+`emovies-member` maps to movie-reader behavior, `emovies-staff` maps to
+review-moderator behavior, and `emovies-admin` maps to admin behavior.
+
+Keycloak only imports a realm when it does not already exist. If your local
+`emovies` realm was created before self-registration was enabled, either turn on
+**Realm settings → Login → User registration** and add `movies-reader` to the
+realm's default roles in the Admin Console, or recreate the local Keycloak data
+volume before starting the stack again.
 
 ## Authenticate
 
@@ -68,9 +116,36 @@ curl -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   http://localhost:5000/api/movies
 ```
 
-The `movies-reader` realm role can read movies. The `movies-admin` role can
-create, update, and delete them. Any authenticated user can submit one review
-per movie. The `reviews-moderator` or `movies-admin` role can moderate reviews.
+See [Roles and permissions](#roles-and-permissions) for the current role and
+policy model.
+
+### Authenticate in Swagger UI
+
+Open `http://localhost:5000/swagger`, select **Authorize**, and choose the
+available `openid` and `profile` scopes. Swagger redirects to Keycloak using the
+Authorization Code flow with PKCE.
+
+For local development, sign in with:
+
+```text
+Username: demo
+Password: demo_dev_password
+```
+
+After authorization, Swagger automatically includes the access token when
+executing protected endpoints. The health endpoint remains anonymous. Swagger
+UI is enabled only in the Development environment by default.
+
+If the `emovies` realm was imported before Swagger support was added, update the
+`emovies-client` in the Keycloak Admin Console with:
+
+```text
+Valid redirect URI: http://localhost:5000/swagger/oauth2-redirect.html
+Web origin:         http://localhost:5000
+```
+
+Keycloak skips startup imports for realms that already exist, so editing the
+realm JSON does not update an existing realm automatically.
 
 ## Postman
 
@@ -151,7 +226,7 @@ Approve a review with `{ "approve": true }`. Reject one with
 Each module owns its `DbContext`, migration folder, PostgreSQL schema, and
 migration history. Run all migration commands from the `api` directory.
 
-Development mode automatically applies pending migrations for both modules when
+Development mode automatically applies pending migrations for all modules when
 the API starts:
 
 ```bash
@@ -273,9 +348,8 @@ dotnet ef migrations remove \
   --context ReviewsDbContext
 ```
 
-Replace `ReviewsDbContext` and the Reviews project path with
-`MoviesDbContext` and the Movies project path to run the same commands for the
-Movies module.
+Replace the context and module path to run the same commands for
+`MoviesDbContext` or `UsersDbContext`.
 
 To target another database, provide the module's connection string:
 
@@ -296,11 +370,13 @@ for example:
 ```text
 ConnectionStrings__MoviesDatabase=...
 ConnectionStrings__ReviewsDatabase=...
+ConnectionStrings__UsersDatabase=...
 Keycloak__Authority=https://identity.example.com/realms/emovies
 Keycloak__Audience=emovies-api
 Keycloak__RequireHttpsMetadata=true
 Movies__MigrateOnStartup=false
 Reviews__MigrateOnStartup=false
+Users__MigrateOnStartup=false
 AutoMapper__LicenseKey=...
 ```
 

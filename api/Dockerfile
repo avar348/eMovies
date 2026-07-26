@@ -6,6 +6,7 @@ COPY src/EMovies.Api/EMovies.Api.csproj src/EMovies.Api/
 COPY src/Modules/Movies/EMovies.Modules.Movies.Contracts/EMovies.Modules.Movies.Contracts.csproj src/Modules/Movies/EMovies.Modules.Movies.Contracts/
 COPY src/Modules/Movies/EMovies.Modules.Movies/EMovies.Modules.Movies.csproj src/Modules/Movies/EMovies.Modules.Movies/
 COPY src/Modules/Reviews/EMovies.Modules.Reviews/EMovies.Modules.Reviews.csproj src/Modules/Reviews/EMovies.Modules.Reviews/
+COPY src/Modules/Users/EMovies.Modules.Users/EMovies.Modules.Users.csproj src/Modules/Users/EMovies.Modules.Users/
 RUN dotnet restore src/EMovies.Api/EMovies.Api.csproj
 
 COPY src/ src/

@@ -6,6 +6,8 @@ public sealed class KeycloakOptions
 
     public required string Authority { get; init; }
 
+    public string? MetadataAddress { get; init; }
+
     public required string Audience { get; init; }
 
     public bool RequireHttpsMetadata { get; init; } = true;
