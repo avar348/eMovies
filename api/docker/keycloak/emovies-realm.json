@@ -1,0 +1,82 @@
+{
+  "realm": "emovies",
+  "enabled": true,
+  "displayName": "eMovies",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "movies-reader",
+        "description": "Can read movies"
+      },
+      {
+        "name": "movies-admin",
+        "description": "Can create, update, and delete movies"
+      },
+      {
+        "name": "reviews-moderator",
+        "description": "Can approve and reject movie reviews"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "emovies-api",
+      "name": "eMovies API",
+      "enabled": true,
+      "bearerOnly": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "emovies-client",
+      "name": "eMovies Development Client",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "redirectUris": [
+        "http://localhost:*"
+      ],
+      "webOrigins": [
+        "http://localhost:*"
+      ],
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "emovies-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "emovies-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "demo",
+      "email": "demo@emovies.local",
+      "firstName": "Demo",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "demo_dev_password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "movies-reader",
+        "movies-admin",
+        "reviews-moderator"
+      ]
+    }
+  ]
+}
