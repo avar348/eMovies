@@ -25,5 +25,15 @@ public interface IUserProfileService
         string email,
         string displayName,
         UserAccountType accountType,
+        string? phoneNumber,
+        string? organizationName,
+        string? addressLine1,
+        string? addressLine2,
+        string? city,
+        string? stateRegion,
+        string? postalCode,
+        string? country,
+        int? serviceAreaMiles,
+        string? serviceAreaCoverage,
         CancellationToken cancellationToken);
 }

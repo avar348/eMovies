@@ -83,6 +83,7 @@ public sealed class UsersController(
             User.FindFirstValue("email") ??
             $"{identitySubject}@identity.local";
         var displayName =
+            request.DisplayName ??
             User.FindFirstValue("name") ??
             User.FindFirstValue("preferred_username") ??
             identitySubject;
@@ -92,6 +93,16 @@ public sealed class UsersController(
             email,
             displayName,
             request.AccountType,
+            request.PhoneNumber,
+            request.OrganizationName,
+            request.AddressLine1,
+            request.AddressLine2,
+            request.City,
+            request.StateRegion,
+            request.PostalCode,
+            request.Country,
+            request.ServiceAreaMiles,
+            request.ServiceAreaCoverage,
             cancellationToken));
     }
 

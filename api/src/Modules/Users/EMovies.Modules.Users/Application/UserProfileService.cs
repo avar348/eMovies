@@ -87,6 +87,16 @@ internal sealed class UserProfileService(
         string email,
         string displayName,
         UserAccountType accountType,
+        string? phoneNumber,
+        string? organizationName,
+        string? addressLine1,
+        string? addressLine2,
+        string? city,
+        string? stateRegion,
+        string? postalCode,
+        string? country,
+        int? serviceAreaMiles,
+        string? serviceAreaCoverage,
         CancellationToken cancellationToken)
     {
         var profile = await dbContext.UserProfiles.SingleOrDefaultAsync(
@@ -100,7 +110,17 @@ internal sealed class UserProfileService(
                 email,
                 displayName,
                 accountType,
-                timeProvider);
+                timeProvider,
+                phoneNumber,
+                organizationName,
+                addressLine1,
+                addressLine2,
+                city,
+                stateRegion,
+                postalCode,
+                country,
+                serviceAreaMiles,
+                serviceAreaCoverage);
             dbContext.UserProfiles.Add(profile);
         }
         else
@@ -109,7 +129,17 @@ internal sealed class UserProfileService(
                 email,
                 displayName,
                 accountType,
-                timeProvider);
+                timeProvider,
+                phoneNumber,
+                organizationName,
+                addressLine1,
+                addressLine2,
+                city,
+                stateRegion,
+                postalCode,
+                country,
+                serviceAreaMiles,
+                serviceAreaCoverage);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -125,6 +155,16 @@ internal sealed class UserProfileService(
             profile.DisplayName,
             profile.AccountType,
             profile.OnboardingStatus,
+            profile.PhoneNumber,
+            profile.OrganizationName,
+            profile.AddressLine1,
+            profile.AddressLine2,
+            profile.City,
+            profile.StateRegion,
+            profile.PostalCode,
+            profile.Country,
+            profile.ServiceAreaMiles,
+            profile.ServiceAreaCoverage,
             profile.CreatedAtUtc,
             profile.UpdatedAtUtc);
     }

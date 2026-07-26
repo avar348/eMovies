@@ -34,6 +34,33 @@ internal sealed class UserProfileConfiguration
             .HasMaxLength(40)
             .IsRequired();
 
+        builder.Property(user => user.PhoneNumber)
+            .HasMaxLength(40);
+
+        builder.Property(user => user.OrganizationName)
+            .HasMaxLength(200);
+
+        builder.Property(user => user.AddressLine1)
+            .HasMaxLength(200);
+
+        builder.Property(user => user.AddressLine2)
+            .HasMaxLength(200);
+
+        builder.Property(user => user.City)
+            .HasMaxLength(120);
+
+        builder.Property(user => user.StateRegion)
+            .HasMaxLength(120);
+
+        builder.Property(user => user.PostalCode)
+            .HasMaxLength(40);
+
+        builder.Property(user => user.Country)
+            .HasMaxLength(120);
+
+        builder.Property(user => user.ServiceAreaCoverage)
+            .HasMaxLength(1_000);
+
         builder.Property(user => user.CreatedAtUtc)
             .HasColumnType("timestamp with time zone");
 
