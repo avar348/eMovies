@@ -46,10 +46,21 @@ Development mode automatically applies EF Core migrations. The API listens on
 `localhost:5432`. Swagger UI is available at
 `http://localhost:5000/swagger`.
 
-The included development identities are:
+The local development identities are:
 
-- Keycloak admin: `admin` / `admin_dev_password`
-- API demo user: `demo` / `demo_dev_password`
+- Keycloak Admin Console administrator (`master` realm):
+  `admin` / `admin_dev_password`
+- eMovies application administrator used by the current local test environment
+  (`emovies` realm):
+  `admin.user` / `admin_dev_password`
+- Clean-realm seeded API identity: `demo` / `demo_dev_password`
+
+The Keycloak administrator manages realms, clients, roles, and identities at
+`http://localhost:8080/admin`. It is not the account used to test the eMovies
+administration dashboard. Use `admin.user` through the frontend login flow to
+review library-manager requests. The bundled realm import seeds `demo` with
+application-admin roles; `admin.user` is the dedicated administrator in the
+current retained development realm.
 
 These credentials and development-mode settings must be replaced outside local
 development.
@@ -90,11 +101,51 @@ Legacy local realm roles are still accepted for compatibility:
 `emovies-member` maps to movie-reader behavior, `emovies-staff` maps to
 review-moderator behavior, and `emovies-admin` maps to admin behavior.
 
+The local `admin.user` identity must have both `movies-reader` and
+`movies-admin`. The reader role allows the login callback to validate catalog
+access, while the admin role enables the approval API and administration
+workspace. An administrator automatically receives manager-level API
+permissions; it does not need the `movies-manager` role.
+
+## Administrator flow
+
+1. Sign out of any renter or pending-manager session in the frontend.
+2. Continue to Keycloak and sign in with:
+
+   ```text
+   Username: admin.user
+   Password: admin_dev_password
+   ```
+
+3. After Keycloak redirects to the frontend, the dashboard displays:
+   - **Administration → Pending manager approvals**
+   - The number of pending library-manager requests
+   - **Approve** and **Deny** actions for each pending request
+   - The manager-level **Library operations** workspace
+
+Approving a request changes its Users module profile from `PendingApproval` to
+`Active` and assigns the `movies-manager` Keycloak role. Denying a request
+changes the profile to `Denied` and removes that role. A pending manager can
+use renter-facing features but cannot see manager tools before approval.
+
 Keycloak only imports a realm when it does not already exist. If your local
 `emovies` realm was created before self-registration was enabled, either turn on
 **Realm settings → Login → User registration** and add `movies-reader` to the
 realm's default roles in the Admin Console, or recreate the local Keycloak data
 volume before starting the stack again.
+
+For an existing local realm, also verify that:
+
+- Realm roles include `movies-reader`, `movies-manager`, and `movies-admin`.
+- `admin.user` has `movies-reader` and `movies-admin`.
+- New self-registered identities receive `movies-reader`.
+
+If the administration panel says pending approvals are unavailable, call
+`GET /api/users/pending-approvals` without a token. A current API build returns
+`401 Unauthorized`. A `409 Conflict` stating that
+`users.manage-approvals` was not found means the running API image predates the
+Users module authorization policy. Rebuild and restart the API from the current
+source, then sign out and back in so Keycloak issues a fresh token.
 
 ## Authenticate
 
